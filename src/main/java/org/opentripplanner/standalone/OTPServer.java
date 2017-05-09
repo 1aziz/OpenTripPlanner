@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.analyst.DiskBackedPointSetCache;
 import org.opentripplanner.analyst.PointSetCache;
+import org.opentripplanner.analyst.PointSetCacheService;
 import org.opentripplanner.analyst.SurfaceCache;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
@@ -29,7 +30,7 @@ public class OTPServer {
 
     // Optional Analyst global modules (caches)
     public SurfaceCache surfaceCache;
-    public PointSetCache pointSetCache;
+    public PointSetCacheService pointSetCache;
     public ScriptingService scriptingService;
 
     public CommandLineParameters params;

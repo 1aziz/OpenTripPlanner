@@ -18,17 +18,14 @@ import java.util.Properties;
 public class RedeliveryTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedeliveryTest.class);
-    static final int N_TASKS = 100;
-    static final int N_WORKERS = 4;
+    static final int AMOUNT_TASKS = 100;
+    static final int AMOUNT_OF_WORKERS = 4;
     static final int FAILURE_RATE = 20; // percent
 
     public static void main(String[] params) {
 
         // Start a broker in a new thread.
-        Properties brokerConfig = new Properties();
-        brokerConfig.setProperty("graphs-bucket", "FAKE");
-        brokerConfig.setProperty("pointsets-bucket", "FAKE");
-        brokerConfig.setProperty("work-offline", "true");
+        Properties brokerConfig = getBrokerConfig();
         BrokerMain brokerMain = new BrokerMain(brokerConfig);
         Thread brokerThread = new Thread(brokerMain); // TODO combine broker and brokermain, set offline mode.
         brokerThread.start();
@@ -37,7 +34,7 @@ public class RedeliveryTest {
         Properties workerConfig = new Properties();
         workerConfig.setProperty("initial-graph-id", "GRAPH");
         List<Thread> workerThreads = new ArrayList<>();
-        for (int i = 0; i < N_WORKERS; i++) {
+        for (int i = 0; i < AMOUNT_OF_WORKERS; i++) {
             AnalystWorker worker = new AnalystWorker(workerConfig);
             worker.dryRunFailureRate = FAILURE_RATE;
             Thread workerThread = new Thread(worker);
@@ -45,11 +42,7 @@ public class RedeliveryTest {
             workerThread.start();
         }
 
-        // Feed some work to the broker.
-        JobSimulator jobSimulator = new JobSimulator();
-        jobSimulator.nOrigins = N_TASKS;
-        jobSimulator.graphId = "GRAPH";
-        jobSimulator.sendFakeJob();
+        getTestedJobSimulator();
 
         // Wait for all tasks to be marked finished
         while (brokerMain.broker.anyJobsActive()) {
@@ -63,6 +56,26 @@ public class RedeliveryTest {
 
         LOG.info("All jobs finished.");
         System.exit(0);
+    }
+
+    private static void getTestedJobSimulator() {
+        JobSimulator jobSimulator = getJobSimulator();
+        jobSimulator.sendFakeJob();
+    }
+
+    private static JobSimulator getJobSimulator() {
+        JobSimulator jobSimulator = new JobSimulator();
+        jobSimulator.nOrigins = AMOUNT_TASKS;
+        jobSimulator.graphId = "GRAPH";
+        return jobSimulator;
+    }
+
+    private static Properties getBrokerConfig() {
+        Properties brokerConfig = new Properties();
+        brokerConfig.setProperty("graphs-bucket", "FAKE");
+        brokerConfig.setProperty("pointsets-bucket", "FAKE");
+        brokerConfig.setProperty("work-offline", "true");
+        return brokerConfig;
     }
 
 }

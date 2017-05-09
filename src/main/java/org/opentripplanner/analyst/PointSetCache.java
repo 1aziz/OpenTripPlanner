@@ -10,7 +10,7 @@ import java.util.List;
  * This is a loadingCache, so it will attempt to load pointsets only when they are requested.
  * Therefore loading errors will only surface when pointsets are first used.
  */
-public abstract class PointSetCache {
+public abstract class PointSetCache implements PointSetCacheService{
 
     private static final Logger LOG = LoggerFactory.getLogger(PointSetCache.class);
     
