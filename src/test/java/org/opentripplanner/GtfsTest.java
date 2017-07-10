@@ -95,7 +95,7 @@ public abstract class GtfsTest extends TestCase {
         try {
             final boolean fullDataset = false;
             InputStream inputStream = new FileInputStream(gtfsRealTime);
-            FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
+            FeedMessage feedMessage = FeedMessage.parser.parseFrom(inputStream);
             List<FeedEntity> feedEntityList = feedMessage.getEntityList();
             List<TripUpdate> updates = new ArrayList<TripUpdate>(feedEntityList.size());
             for (FeedEntity feedEntity : feedEntityList) {

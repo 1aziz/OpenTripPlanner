@@ -64,7 +64,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
             InputStream is = new FileInputStream(file);
             if (is != null) {
                 // Decode message
-                feedMessage = FeedMessage.PARSER.parseFrom(is);
+                feedMessage = FeedMessage.parser.parseFrom(is);
                 feedEntityList = feedMessage.getEntityList();
                 
                 // Change fullDataset value if this is an incremental update
