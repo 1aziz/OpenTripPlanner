@@ -22,7 +22,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +175,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             boolean fullDataset = true;
             try {
                 // Decode message
-                feedMessage = FeedMessage.PARSER.parseFrom(message);
+                feedMessage = FeedMessage.parser.parseFrom(message);
                 feedEntityList = feedMessage.getEntityList();
                 
                 // Change fullDataset value if this is an incremental update

@@ -103,7 +103,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
 
-            final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
+            final FeedMessage feed = FeedMessage.parser.parseFrom(data);
 
             long feedTimestamp = feed.getHeader().getTimestamp();
             if (feedTimestamp <= lastTimestamp) {
