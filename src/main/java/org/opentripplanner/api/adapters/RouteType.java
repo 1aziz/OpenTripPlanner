@@ -13,32 +13,74 @@
 
 package org.opentripplanner.api.adapters;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Route;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 /**
-   Holds data about a GTFS route from routes.txt.  Data includes id,
-   short name, long name, color, etc.
-*/
+ * Holds data about a GTFS route from routes.txt.  Data includes id,
+ * short name, long name, color, etc.
+ */
 
 @XmlRootElement(name = "route")
 public class RouteType {
 
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId id;
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId serviceId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeShortName;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeLongName;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeDesc;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeUrl;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeColor;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer routeTypeAtr;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String routeTextColor;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer routeBikesAllowed;
+
     public RouteType() {
+        /*
+    Why is this empty?
+*/
     }
 
-    public RouteType(Route route) {
+    RouteType(Route route) {
         this.id = route.getId();
         this.routeShortName = route.getShortName();
         this.routeLongName = route.getLongName();
         this.routeDesc = route.getDesc();
-        this.routeType = route.getType();
+        this.routeTypeAtr = route.getType();
         this.routeUrl = route.getUrl();
         this.routeColor = route.getColor();
         this.routeTextColor = route.getTextColor();
@@ -48,59 +90,19 @@ public class RouteType {
     public RouteType(Route route, Boolean extended) {
         this.id = route.getId();
         this.routeShortName = route.getShortName();
-        this.routeType = route.getType();
+        this.routeTypeAtr = route.getType();
         this.routeLongName = route.getLongName();
         if (extended != null && extended.equals(true)) {
             this.routeDesc = route.getDesc();
-            this.routeType = route.getType();
+            this.routeTypeAtr = route.getType();
             this.routeUrl = route.getUrl();
             this.routeColor = route.getColor();
             this.routeTextColor = route.getTextColor();
         }
     }
-    
-    public AgencyAndId getId(){
+
+    public AgencyAndId getId() {
         return this.id;
     }
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId id;
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId serviceId;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeShortName;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeLongName;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeDesc;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeUrl;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeColor;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer routeType;
-
-    @XmlAttribute
-    @JsonSerialize
-    String routeTextColor;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer routeBikesAllowed;
 
 }

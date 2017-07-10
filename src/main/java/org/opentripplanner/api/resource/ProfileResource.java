@@ -45,7 +45,7 @@ public class ProfileResource {
 
     public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
-        graph = router.graph;
+        graph = router.getGraph();
         surfaceCache = otpServer.surfaceCache;
     }
 

@@ -22,13 +22,11 @@ import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -197,7 +195,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         Vertex bottomV = gg.getVertex("osm:node:580290955");
         Vertex topV = gg.getVertex("osm:node:559271124");
 
-        request.setRoutingContext(a.graph, bottomV, topV);
+        request.setRoutingContext(a.getGraph(), bottomV, topV);
 
         GraphPathFinder graphPathFinder = new GraphPathFinder(a);
         List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);

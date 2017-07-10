@@ -26,16 +26,16 @@ public class RoutersTest {
         OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
         otpServer.getGraphService().registerGraph("", new MemoryGraphSource(null, new Graph()));
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("", new Graph()));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "A", 0, 0, 0));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "B", 0, 1, 0));
-        otpServer.getGraphService().getRouter("A").graph.addVertex(new ExitVertex(null, "C", 1, 1, 0));
+        otpServer.getGraphService().getRouter("A").getGraph().addVertex(new ExitVertex(null, "A", 0, 0, 0));
+        otpServer.getGraphService().getRouter("A").getGraph().addVertex(new ExitVertex(null, "B", 0, 1, 0));
+        otpServer.getGraphService().getRouter("A").getGraph().addVertex(new ExitVertex(null, "C", 1, 1, 0));
         //this needs to be added since convex hull isn't lazy loaded anymore
-        otpServer.getGraphService().getRouter("A").graph.calculateConvexHull();
-        otpServer.getGraphService().getRouter("").graph.calculateConvexHull();
+        otpServer.getGraphService().getRouter("A").getGraph().calculateConvexHull();
+        otpServer.getGraphService().getRouter("").getGraph().calculateConvexHull();
         //this needs to be added since it is otherwise calculated during OSM/Transit loading
         // which doesn't happen in this test
-        otpServer.getGraphService().getRouter("A").graph.calculateEnvelope();
-        otpServer.getGraphService().getRouter("").graph.calculateEnvelope();
+        otpServer.getGraphService().getRouter("A").getGraph().calculateEnvelope();
+        otpServer.getGraphService().getRouter("").getGraph().calculateEnvelope();
 
         Routers routerApi = new Routers();
         routerApi.otpServer = otpServer;

@@ -98,8 +98,8 @@ public class IndexAPI {
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
-        index = router.graph.index;
-        streetIndex = router.graph.streetIndex;
+        index = router.getGraph().index;
+        streetIndex = router.getGraph().streetIndex;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */

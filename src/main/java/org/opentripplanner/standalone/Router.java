@@ -33,7 +33,7 @@ public class Router {
     public static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
     public String id;
-    public Graph graph;
+    private Graph graph;
     public double[] timeouts = {5, 4, 2};
 
     /**
@@ -64,7 +64,7 @@ public class Router {
 
     public Router(String id, Graph graph) {
         this.id = id;
-        this.graph = graph;
+        this.setGraph(graph);
     }
 
 
@@ -80,13 +80,13 @@ public class Router {
      */
     public void startup(JsonNode config) {
 
-        this.tileRendererManager = new TileRendererManager(this.graph);
+        this.tileRendererManager = new TileRendererManager(this.getGraph());
 
         // Analyst Modules FIXME make these optional based on JSON?
         {
-            this.tileCache = new TileCache(this.graph);
+            this.tileCache = new TileCache(this.getGraph());
             this.renderer = new Renderer(this.tileCache);
-            this.sampleGridRenderer = new SampleGridRenderer(this.graph);
+            this.sampleGridRenderer = new SampleGridRenderer(this.getGraph());
             this.isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(this.sampleGridRenderer);
         }
 
@@ -136,41 +136,41 @@ public class Router {
 
         JsonNode boardTimes = config.get("boardTimes");
         if (boardTimes != null && boardTimes.isObject()) {
-            graph.boardTimes = new EnumMap<>(TraverseMode.class);
+            getGraph().boardTimes = new EnumMap<>(TraverseMode.class);
             for (TraverseMode mode : TraverseMode.values()) {
                 if (boardTimes.has(mode.name())) {
-                    graph.boardTimes.put(mode, boardTimes.get(mode.name()).asInt(0));
+                    getGraph().boardTimes.put(mode, boardTimes.get(mode.name()).asInt(0));
                 }
             }
         }
 
         JsonNode alightTimes = config.get("alightTimes");
         if (alightTimes != null && alightTimes.isObject()) {
-            graph.alightTimes = new EnumMap<>(TraverseMode.class);
+            getGraph().alightTimes = new EnumMap<>(TraverseMode.class);
             for (TraverseMode mode : TraverseMode.values()) {
                 if (alightTimes.has(mode.name())) {
-                    graph.alightTimes.put(mode, alightTimes.get(mode.name()).asInt(0));
+                    getGraph().alightTimes.put(mode, alightTimes.get(mode.name()).asInt(0));
                 }
             }
         }
         
         JsonNode stopClusterMode = config.get("stopClusterMode");
         if (stopClusterMode != null) {
-            graph.stopClusterMode = stopClusterMode.asText();    
+            getGraph().stopClusterMode = stopClusterMode.asText();
         } else {
-            graph.stopClusterMode = "proximity";
+            getGraph().stopClusterMode = "proximity";
         }
         
         /* Create Graph updater modules from JSON config. */
-        GraphUpdaterConfigurator.setupGraph(this.graph, config);
+        GraphUpdaterConfigurator.setupGraph(this.getGraph(), config);
 
         /* Compute ellipsoidToGeoidDifference for this Graph */
         try {
-            WorldEnvelope env = graph.getEnvelope();
+            WorldEnvelope env = getGraph().getEnvelope();
             double lat = (env.getLowerLeftLatitude() + env.getUpperRightLatitude()) / 2;
             double lon = (env.getLowerLeftLongitude() + env.getUpperRightLongitude()) / 2;
-            graph.ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
-            LOG.info("Computed ellipsoid/geoid offset at (" + lat + ", " + lon + ") as " + graph.ellipsoidToGeoidDifference);
+            getGraph().ellipsoidToGeoidDifference = ElevationUtils.computeEllipsoidToGeoidDifference(lat, lon);
+            LOG.info("Computed ellipsoid/geoid offset at (" + lat + ", " + lon + ") as " + getGraph().ellipsoidToGeoidDifference);
         } catch (Exception e) {
             LOG.error("Error computing ellipsoid/geoid difference");
         }
@@ -178,7 +178,7 @@ public class Router {
 
     /** Shut down this router when evicted or (auto-)reloaded. Stop any real-time updater threads. */
     public void shutdown() {
-        GraphUpdaterConfigurator.shutdownGraph(this.graph);
+        GraphUpdaterConfigurator.shutdownGraph(this.getGraph());
     }
 
     /**
@@ -203,4 +203,11 @@ public class Router {
         return logger;
     }
 
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
 }

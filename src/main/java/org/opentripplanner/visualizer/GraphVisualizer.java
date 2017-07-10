@@ -16,7 +16,6 @@ package org.opentripplanner.visualizer;
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import javassist.Modifier;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
@@ -417,7 +416,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         LOG.info("Starting up graph visualizer...");
         setTitle("GraphVisualizer");
         this.router = router;
-        this.graph = router.graph;
+        this.graph = router.getGraph();
         init();
     }
 

@@ -146,7 +146,7 @@ public class Routers {
             //new router is created here instead of loaded from router
             //since routerId here isn't always the same as routerId when Router was created
             //at least this happens in RoutersTest
-            return new RouterInfo(routerId, router.graph);
+            return new RouterInfo(routerId, router.getGraph());
         } catch (GraphNotFoundException e) {
             return null;
         }

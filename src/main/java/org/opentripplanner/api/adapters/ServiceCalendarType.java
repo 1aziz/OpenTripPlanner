@@ -13,20 +13,60 @@
 
 package org.opentripplanner.api.adapters;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 @XmlRootElement(name = "Calendar")
 public class ServiceCalendarType {
 
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId serviceId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer monday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer tuesday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer wednesday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer thursday;
+
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer friday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer saturday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer sunday;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Long startDate;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Long endDate;
+
     public ServiceCalendarType(AgencyAndId serviceId, int monday, int tuesday, int wednesday,
-            int thursday, int friday, int saturday, int sunday, long startDate, long endDate) {
+                               int thursday, int friday, int saturday, int sunday, long startDate, long endDate) {
         this.serviceId = serviceId;
         this.monday = monday;
         this.tuesday = tuesday;
@@ -53,46 +93,10 @@ public class ServiceCalendarType {
     }
 
     public ServiceCalendarType() {
+ /*
+        Why is this empty?
+    */
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId serviceId;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer monday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer tuesday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer wednesday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer thursday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer friday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer saturday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer sunday;
-
-    @XmlAttribute
-    @JsonSerialize
-    Long startDate;
-
-    @XmlAttribute
-    @JsonSerialize
-    Long endDate;
 
 }

@@ -90,7 +90,7 @@ public class GraphPathFinder {
         // Reuse one instance of AStar for all N requests, which are carried out sequentially
         AStar aStar = new AStar();
         if (options.rctx == null) {
-            options.setRoutingContext(router.graph);
+            options.setRoutingContext(router.getGraph());
             // The special long-distance heuristic should be sufficient to constrain the search to the right area.
         }
         // If this Router has a GraphVisualizer attached to it, set it as a callback for the AStar search
@@ -267,7 +267,7 @@ public class GraphPathFinder {
                 intermediateRequest.from = places.get(placeIndex - 1);
                 intermediateRequest.to = places.get(placeIndex);
                 intermediateRequest.rctx = null;
-                intermediateRequest.setRoutingContext(router.graph);
+                intermediateRequest.setRoutingContext(router.getGraph());
 
                 if (debugOutput != null) {// Restore the previous debug info accumulator
                     intermediateRequest.rctx.debugOutput = debugOutput;
@@ -285,7 +285,7 @@ public class GraphPathFinder {
                 time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
                 placeIndex += (request.arriveBy ? -1 : +1);
             }
-            request.setRoutingContext(router.graph);
+            request.setRoutingContext(router.getGraph());
             request.rctx.debugOutput = debugOutput;
             if (request.arriveBy) {
                 Collections.reverse(paths);

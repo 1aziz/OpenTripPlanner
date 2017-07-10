@@ -13,25 +13,72 @@
 
 package org.opentripplanner.api.adapters;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.onebusaway.gtfs.model.AgencyAndId;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.onebusaway.gtfs.model.AgencyAndId;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.List;
 
 @XmlRootElement(name = "Stop")
 public class StopType {
 
-    public StopType() {
-    }
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId id;
 
-    public StopType(org.onebusaway.gtfs.model.Stop stop) {
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String stopName;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private Double stopLat;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private Double stopLon;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String stopCode;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String stopDesc;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String zoneId;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String stopUrl;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private Integer locationType;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String parentStation;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer wheelchairBoarding;
+   
+    @XmlAttribute
+    @JsonSerialize
+    private String direction;
+   
+    @XmlElements(value = @XmlElement(name = "route"))
+    public List<AgencyAndId> routes;
+
+    StopType(org.onebusaway.gtfs.model.Stop stop) {
         this.id = stop.getId();
         this.stopLat = stop.getLat();
         this.stopLon = stop.getLon();
@@ -42,7 +89,6 @@ public class StopType {
         this.stopUrl = stop.getUrl();
         this.locationType = stop.getLocationType();
         this.parentStation = stop.getParentStation();
-        // this.stopTimezone = stop.getTimezone();s
         this.wheelchairBoarding = stop.getWheelchairBoarding();
         this.direction = stop.getDirection();
     }
@@ -59,60 +105,7 @@ public class StopType {
             this.stopUrl = stop.getUrl();
             this.locationType = stop.getLocationType();
             this.parentStation = stop.getParentStation();
-            // this.stopTimezone = stop.getTimezone();
             this.wheelchairBoarding = stop.getWheelchairBoarding();
         }
     }
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId id;
-
-    @XmlAttribute
-    @JsonSerialize
-    String stopName;
-
-    @XmlAttribute
-    @JsonSerialize
-    Double stopLat;
-
-    @XmlAttribute
-    @JsonSerialize
-    Double stopLon;
-
-    @XmlAttribute
-    @JsonSerialize
-    String stopCode;
-
-    @XmlAttribute
-    @JsonSerialize
-    String stopDesc;
-
-    @XmlAttribute
-    @JsonSerialize
-    String zoneId;
-
-    @XmlAttribute
-    @JsonSerialize
-    String stopUrl;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer locationType;
-
-    @XmlAttribute
-    @JsonSerialize
-    String parentStation;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer wheelchairBoarding;
-
-    @XmlAttribute
-    @JsonSerialize
-    String direction;
-
-    @XmlElements(value = @XmlElement(name = "route"))
-    public List<AgencyAndId> routes;
-
 }

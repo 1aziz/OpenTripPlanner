@@ -26,8 +26,59 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @XmlRootElement(name = "trip")
 public class TripType {
 
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    AgencyAndId id;
+
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private
+    AgencyAndId serviceId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String tripShortName;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String tripHeadsign;
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId routeId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String directionId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private String blockId;
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
+    private AgencyAndId shapeId;
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer wheelchairAccessible;
+
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer tripBikesAllowed;
+
+
+    @XmlAttribute
+    @JsonSerialize
+    private Integer bikesAllowed;
+
+    private Route route;
+
     @SuppressWarnings("deprecation")
-    public TripType(Trip obj) {
+    TripType(Trip obj) {
         this.id = obj.getId();
         this.serviceId = obj.getServiceId();
         this.tripShortName = obj.getTripShortName();
@@ -37,7 +88,6 @@ public class TripType {
         this.blockId = obj.getBlockId();
         this.shapeId = obj.getShapeId();
         this.wheelchairAccessible = obj.getWheelchairAccessible();
-        this.tripBikesAllowed = obj.getTripBikesAllowed();
         this.bikesAllowed = obj.getBikesAllowed();
         this.route = obj.getRoute();
     }
@@ -55,60 +105,9 @@ public class TripType {
             this.blockId = obj.getBlockId();
             this.shapeId = obj.getShapeId();
             this.wheelchairAccessible = obj.getWheelchairAccessible();
-            this.tripBikesAllowed = obj.getTripBikesAllowed();
             this.bikesAllowed = obj.getBikesAllowed();
         }
     }
-
-    public TripType() {
-    }
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId id;
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId serviceId;
-
-    @XmlAttribute
-    @JsonSerialize
-    String tripShortName;
-
-    @XmlAttribute
-    @JsonSerialize
-    String tripHeadsign;
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId routeId;
-
-    @XmlAttribute
-    @JsonSerialize
-    String directionId;
-
-    @XmlAttribute
-    @JsonSerialize
-    String blockId;
-
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    AgencyAndId shapeId;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer wheelchairAccessible;
-
-    @XmlAttribute
-    @JsonSerialize
-    Integer tripBikesAllowed;
-    
-    @XmlAttribute
-    @JsonSerialize
-    Integer bikesAllowed;
-
-    Route route;
-
     public Route getRoute() {
         return route;
     }

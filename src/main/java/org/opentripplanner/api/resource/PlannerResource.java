@@ -13,20 +13,16 @@
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.RoutingResource;
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -34,12 +30,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -60,16 +53,8 @@ public class PlannerResource extends RoutingResource {
     // parameters in the outgoing response. This is a TriMet requirement.
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
     public Response plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
-
-        /*
-         * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
-         *       or vertex ids to planner (or error back to user)
-         * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
-         *       out so it's used here too...
-         */
 
         // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
         Response response = new Response(uriInfo);
@@ -92,7 +77,7 @@ public class PlannerResource extends RoutingResource {
 
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass()))
+            if (!PlannerError.isPlanningError(e.getClass()))
                 LOG.warn("Error while planning path: ", e);
             response.setError(error);
         } finally {
@@ -100,20 +85,23 @@ public class PlannerResource extends RoutingResource {
                 if (request.rctx != null) {
                     response.debugOutput = request.rctx.debugOutput;
                 }
-                request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
+                request.cleanup();
             }
         }
 
         /* Populate up the elevation metadata */
         response.elevationMetadata = new ElevationMetadata();
-        response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
+        assert router != null;
+        if (router.getGraph() != null) {
+            response.elevationMetadata.ellipsoidToGeoidDifference = router.getGraph().ellipsoidToGeoidDifference;
+
+        }
         response.elevationMetadata.geoidElevation = request.geoidElevation;
 
         /* Log this request if such logging is enabled. */
-        if (request != null && router != null && router.requestLogger != null) {
+        if (router.requestLogger != null) {
             StringBuilder sb = new StringBuilder();
             String clientIpAddress = grizzlyRequest.getRemoteAddr();
-            //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
             sb.append(clientIpAddress);
             sb.append(' ');
             sb.append(request.arriveBy ? "ARRIVE" : "DEPART");

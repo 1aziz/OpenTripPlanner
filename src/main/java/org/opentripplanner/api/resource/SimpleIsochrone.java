@@ -160,7 +160,7 @@ public class SimpleIsochrone extends RoutingResource {
         rangeCheckParameters();
         request = buildRequest();
         Router router = otpServer.getRouter(routerId);
-        Graph graph = router.graph;
+        Graph graph = router.getGraph();
         //double speed = request.getWalkSpeed();
         Coordinate originCoord = request.from.getCoordinate();
         if (originCoord == null) return null;

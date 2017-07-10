@@ -198,7 +198,7 @@ public class BatchProcessor {
         else
             req.from = latLon;
         try {
-            req.setRoutingContext(graphService.getRouter(req.routerId).graph);
+            req.setRoutingContext(graphService.getRouter(req.routerId).getGraph());
             return req;
         } catch (VertexNotFoundException vnfe) {
             LOG.debug("no vertex could be created near the origin point");

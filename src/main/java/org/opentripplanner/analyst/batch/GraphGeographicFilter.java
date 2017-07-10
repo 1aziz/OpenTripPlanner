@@ -16,8 +16,6 @@ package org.opentripplanner.analyst.batch;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -55,7 +53,7 @@ public class GraphGeographicFilter implements IndividualFilter {
         LOG.debug("using only stops? {}", useOnlyStops);
         if (bufferMeters < prototypeRoutingRequest.maxWalkDistance)
             LOG.warn("geographic filter buffer is smaller than max walk distance, this will probably yield incorrect results.");
-        Graph graph= graphService.getRouter(prototypeRoutingRequest.routerId).graph;
+        Graph graph= graphService.getRouter(prototypeRoutingRequest.routerId).getGraph();
         List<Geometry> geometries = new ArrayList<Geometry>();
         for (Vertex v : graph.getVertices()) {
             if (useOnlyStops && ! (v instanceof TransitStop))

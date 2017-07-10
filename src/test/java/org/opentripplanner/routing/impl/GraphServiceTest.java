@@ -91,26 +91,26 @@ public class GraphServiceTest extends TestCase {
         graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
         assertEquals(1, graphService.getRouterIds().size());
 
-        Graph graph = graphService.getRouter("A").graph;
+        Graph graph = graphService.getRouter("A").getGraph();
         assertNotNull(graph);
         assertEquals(emptyGraph, graph);
         assertEquals("A", emptyGraph.routerId);
 
         try {
-            graph = graphService.getRouter("inexistant").graph;
+            graph = graphService.getRouter("inexistant").getGraph();
             assertTrue(false); // Should not be there
         } catch (GraphNotFoundException e) {
         }
 
         graphService.setDefaultRouterId("A");
-        graph = graphService.getRouter().graph;
+        graph = graphService.getRouter().getGraph();
 
         assertEquals(emptyGraph, graph);
 
         graphService.registerGraph("B", new MemoryGraphSource("B", smallGraph));
         assertEquals(2, graphService.getRouterIds().size());
 
-        graph = graphService.getRouter("B").graph;
+        graph = graphService.getRouter("B").getGraph();
         assertNotNull(graph);
         assertEquals(smallGraph, graph);
         assertEquals("B", graph.routerId);
@@ -119,12 +119,12 @@ public class GraphServiceTest extends TestCase {
         assertEquals(1, graphService.getRouterIds().size());
 
         try {
-            graph = graphService.getRouter("A").graph;
+            graph = graphService.getRouter("A").getGraph();
             assertTrue(false); // Should not be there
         } catch (GraphNotFoundException e) {
         }
         try {
-            graph = graphService.getRouter().graph;
+            graph = graphService.getRouter().getGraph();
             assertTrue(false); // Should not be there
         } catch (GraphNotFoundException e) {
         }
@@ -152,7 +152,7 @@ public class GraphServiceTest extends TestCase {
         assertTrue(registered);
 
         // Check if the loaded graph is the one we saved earlier
-        Graph graph = graphService.getRouter("A").graph;
+        Graph graph = graphService.getRouter("A").getGraph();
         assertNotNull(graph);
         assertEquals("A", graph.routerId);
         assertEquals(0, graph.getVertices().size());
@@ -165,7 +165,7 @@ public class GraphServiceTest extends TestCase {
 
         // Force a reload, get again the graph
         graphService.reloadGraphs(false, true);
-        graph = graphService.getRouter("A").graph;
+        graph = graphService.getRouter("A").getGraph();
 
         // Check if loaded graph is the one modified
         assertEquals(verticesCount, graph.getVertices().size());
@@ -218,8 +218,8 @@ public class GraphServiceTest extends TestCase {
         graphScanner = new GraphScanner(graphService, basePath, true);
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());
-        assertEquals("", graphService.getRouter().graph.routerId);
-        assertEquals("", graphService.getRouter("").graph.routerId);
+        assertEquals("", graphService.getRouter().getGraph().routerId);
+        assertEquals("", graphService.getRouter("").getGraph().routerId);
 
         System.out.println("------------------------------------------");
         // Add another graph in a sub-directory
@@ -228,8 +228,8 @@ public class GraphServiceTest extends TestCase {
         graphScanner = new GraphScanner(graphService, basePath, true);
         graphScanner.startup();
         assertEquals(2, graphService.getRouterIds().size());
-        assertEquals("", graphService.getRouter().graph.routerId);
-        assertEquals("A", graphService.getRouter("A").graph.routerId);
+        assertEquals("", graphService.getRouter().getGraph().routerId);
+        assertEquals("A", graphService.getRouter("A").getGraph().routerId);
 
         System.out.println("------------------------------------------");
         // Remove default Graph
@@ -240,8 +240,8 @@ public class GraphServiceTest extends TestCase {
         graphScanner = new GraphScanner(graphService, basePath, true);
         graphScanner.startup();
         assertEquals(1, graphService.getRouterIds().size());
-        assertEquals("A", graphService.getRouter().graph.routerId);
-        assertEquals("A", graphService.getRouter("A").graph.routerId);
+        assertEquals("A", graphService.getRouter().getGraph().routerId);
+        assertEquals("A", graphService.getRouter("A").getGraph().routerId);
 
     }
 
@@ -258,7 +258,7 @@ public class GraphServiceTest extends TestCase {
         graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));
         assertEquals(1, graphService.getRouterIds().size());
 
-        Graph graph = graphService.getRouter("A").graph;
+        Graph graph = graphService.getRouter("A").getGraph();
         assertNotNull(graph);
         assertEquals(emptyGraph, graph);
         assertEquals("A", emptyGraph.routerId);

@@ -53,7 +53,7 @@ public class BikeRental {
 
         Router router = otpServer.getRouter(routerId);
         if (router == null) return null;
-        BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
+        BikeRentalStationService bikeRentalService = router.getGraph().getService(BikeRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);
         if (bikeRentalService == null) return new BikeRentalStationList();

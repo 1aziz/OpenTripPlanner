@@ -40,7 +40,7 @@ public class MemoryGraphSource implements GraphSource {
      */
     public MemoryGraphSource(String routerId, Graph graph) {
         router = new Router(routerId, graph);
-        router.graph.routerId = routerId;
+        router.getGraph().routerId = routerId;
         // We will start up the router later on (updaters and runtime configuration options)
     }
 
@@ -59,16 +59,16 @@ public class MemoryGraphSource implements GraphSource {
             // There is no on-disk set of files for this graph, so only check for embedded router-config JSON.
             ObjectMapper mapper = new ObjectMapper();
             JsonNode routerJsonConf;
-            if (router.graph.routerConfig == null) {
+            if (router.getGraph().routerConfig == null) {
                 LOG.info("No embedded router config available");
                 routerJsonConf = NullNode.getInstance();
             } else {
-                routerJsonConf = mapper.readTree(router.graph.routerConfig);
+                routerJsonConf = mapper.readTree(router.getGraph().routerConfig);
             }
             router.startup(routerJsonConf);
             return true;
         } catch (IOException e) {
-            LOG.error("Can't startup graph: error with embed config (" + router.graph.routerConfig
+            LOG.error("Can't startup graph: error with embed config (" + router.getGraph().routerConfig
                     + ")", e);
             return false;
         }
