@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.analyst.TimeSurface;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.profile.common.TimeoutException;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -79,9 +80,9 @@ public class AnalystProfileRouterPrototype {
     long searchBeginTime;
     long abortTime;
 
-    private void checkTimeout() {
+    private void checkTimeout() throws TimeoutException {
         if (System.currentTimeMillis() > abortTime) {
-            throw new RuntimeException("TIMEOUT");
+            throw new TimeoutException("TIMEOUT");
         }
     }
 
@@ -112,65 +113,9 @@ public class AnalystProfileRouterPrototype {
         Set<Stop> stopsUpdated = fromStops.keySet();
 
         for (int round = 0; round < MAX_RIDES; round++) {
-
-            // TODO maybe even loop until no updates happen? That should happen automatically if MAX_RIDES is high enough.
-
-            /* Get all patterns passing through stops updated in the last round, then reinitialize the updated stops set. */
-            Set<TripPattern> patternsUpdated = uniquePatternsVisiting(stopsUpdated);
-            LOG.info("ROUND {} : {} stops and {} patterns to explore.", round, stopsUpdated.size(), patternsUpdated.size());
-            stopsUpdated = Sets.newHashSet();
-
-            /* RAPTOR style: iterate over each pattern once. */
-            for (TripPattern pattern : patternsUpdated) {
-                //checkTimeout();
-                TimeRange rangeBeingPropagated = null;
-                List<Stop> stops = pattern.getStops();
-                FrequencyEntry freq = pattern.getSingleFrequencyEntry();
-                if (freq == null) continue;
-                TripTimes tt = freq.tripTimes;
-                int headway = freq.headway;
-                for (int sidx = 0; sidx < stops.size(); sidx++) {
-                    Stop stop = stops.get(sidx);
-                    TimeRange existingRange = times.get(stop);
-                    TimeRange reBoardRange = (existingRange != null) ? existingRange.wait(headway) : null;
-                    if (rangeBeingPropagated == null) {
-                        // We do not yet have a range worth propagating
-                        if (reBoardRange != null) {
-                            rangeBeingPropagated = reBoardRange; // this is a fresh protective copy
-                        }
-                    } else {
-                        // We already have a range that is being propagated along the pattern.
-                        // We are certain sidx >= 1 here because we have already boarded in a previous iteration.
-                        TimeRange arrivalRange = rangeBeingPropagated.shift(tt.getRunningTime(sidx - 1));
-                        if (times.add(stop, arrivalRange)) {
-                            // The propagated time improved the best known time in some way.
-                            stopsUpdated.add(stop);
-                        }
-                        // TODO handle case where arrival and departure are different
-                        rangeBeingPropagated = arrivalRange.shift(tt.getDwellTime(sidx));
-                        if (reBoardRange != null) {
-                            rangeBeingPropagated.mergeIn(reBoardRange);
-                        }
-                    }
-                }
-            }
-            /* Transfer from updated stops to adjacent stops before beginning the next round.
-               Iterate over a protective copy because we add more stops to the updated list during iteration. */
-            if ( ! graph.hasDirectTransfers) {
-                throw new RuntimeException("Requires the SimpleTransfers generated in long distance mode.");
-            }
-            for (Stop stop : Lists.newArrayList(stopsUpdated)) {
-                Collection<Edge> outgoingEdges = graph.index.stopVertexForStop.get(stop).getOutgoing();
-                for (SimpleTransfer transfer : Iterables.filter(outgoingEdges, SimpleTransfer.class)) {
-                    Stop targetStop = ((TransitStop) transfer.getToVertex()).getStop();
-                    double walkTime = transfer.getDistance() / request.walkSpeed;
-                    TimeRange rangeAfterTransfer = times.get(stop).shift((int)walkTime);
-                    if (times.add(targetStop, rangeAfterTransfer)) {
-                        stopsUpdated.add(targetStop);
-                    }
-                }
-            }
+            stopsUpdated = getUpdatedStop(times, stopsUpdated, round);
         }
+
         LOG.info("Done with transit.");
         LOG.info("Propagating from transit stops to the street network...");
         // Grab a cached map of distances to street intersections from each transit stop
@@ -203,6 +148,67 @@ public class AnalystProfileRouterPrototype {
         TimeSurface.RangeSet result = TimeSurface.makeSurfaces(this);
         LOG.info("Done making time surfaces.");
         return result;
+    }
+
+    private Set<Stop> getUpdatedStop(TimeRange.Tracker times, Set<Stop> stopsUpdated, int round) {
+        // TODO maybe even loop until no updates happen? That should happen automatically if MAX_RIDES is high enough.
+
+            /* Get all patterns passing through stops updated in the last round, then reinitialize the updated stops set. */
+        Set<TripPattern> patternsUpdated = uniquePatternsVisiting(stopsUpdated);
+        LOG.info("ROUND {} : {} stops and {} patterns to explore.", round, stopsUpdated.size(), patternsUpdated.size());
+        stopsUpdated = Sets.newHashSet();
+
+            /* RAPTOR style: iterate over each pattern once. */
+        for (TripPattern pattern : patternsUpdated) {
+            //checkTimeout();
+            TimeRange rangeBeingPropagated = null;
+            List<Stop> stops = pattern.getStops();
+            FrequencyEntry freq = pattern.getSingleFrequencyEntry();
+            if (freq == null) continue;
+            TripTimes tt = freq.tripTimes;
+            int headway = freq.headway;
+            for (int sidx = 0; sidx < stops.size(); sidx++) {
+                Stop stop = stops.get(sidx);
+                TimeRange existingRange = times.get(stop);
+                TimeRange reBoardRange = (existingRange != null) ? existingRange.wait(headway) : null;
+                if (rangeBeingPropagated == null) {
+                    // We do not yet have a range worth propagating
+                    if (reBoardRange != null) {
+                rangeBeingPropagated = reBoardRange; // this is a fresh protective copy
+            }
+        } else {
+            // We already have a range that is being propagated along the pattern.
+            // We are certain sidx >= 1 here because we have already boarded in a previous iteration.
+            TimeRange arrivalRange = rangeBeingPropagated.shift(tt.getRunningTime(sidx - 1));
+            if (times.add(stop, arrivalRange)) {
+                // The propagated time improved the best known time in some way.
+                stopsUpdated.add(stop);
+            }
+            // TODO handle case where arrival and departure are different
+            rangeBeingPropagated = arrivalRange.shift(tt.getDwellTime(sidx));
+            if (reBoardRange != null) {
+                rangeBeingPropagated.mergeIn(reBoardRange);
+            }
+        }
+    }
+        }
+            /* Transfer from updated stops to adjacent stops before beginning the next round.
+               Iterate over a protective copy because we add more stops to the updated list during iteration. */
+        if ( ! graph.hasDirectTransfers) {
+            throw new RuntimeException("Requires the SimpleTransfers generated in long distance mode.");
+        }
+        for (Stop stop : Lists.newArrayList(stopsUpdated)) {
+            Collection<Edge> outgoingEdges = graph.index.stopVertexForStop.get(stop).getOutgoing();
+            for (SimpleTransfer transfer : Iterables.filter(outgoingEdges, SimpleTransfer.class)) {
+                Stop targetStop = ((TransitStop) transfer.getToVertex()).getStop();
+                double walkTime = transfer.getDistance() / request.walkSpeed;
+                TimeRange rangeAfterTransfer = times.get(stop).shift((int)walkTime);
+                if (times.add(targetStop, rangeAfterTransfer)) {
+                    stopsUpdated.add(targetStop);
+                }
+            }
+        }
+        return stopsUpdated;
     }
 
     /**
