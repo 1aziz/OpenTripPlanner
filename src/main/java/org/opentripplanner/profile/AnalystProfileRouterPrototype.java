@@ -60,7 +60,9 @@ public class AnalystProfileRouterPrototype {
     }
 
     /* Search state */
-    Multimap<StopCluster, StopAtDistance> fromStopPaths, toStopPaths; // ways to reach each origin or dest stop cluster
+    Multimap<StopCluster, StopAtDistance> fromStopPaths; // ways to reach each origin or dest stop cluster
+    Multimap<StopCluster, StopAtDistance> toStopPaths;
+
     List<RoutingContext> routingContexts = Lists.newArrayList();
 
     TObjectIntMap<Stop> fromStops;
@@ -160,7 +162,7 @@ public class AnalystProfileRouterPrototype {
 
             /* RAPTOR style: iterate over each pattern once. */
         for (TripPattern pattern : patternsUpdated) {
-            //checkTimeout();
+
             TimeRange rangeBeingPropagated = null;
             List<Stop> stops = pattern.getStops();
             FrequencyEntry freq = pattern.getSingleFrequencyEntry();
@@ -249,8 +251,8 @@ public class AnalystProfileRouterPrototype {
             this.mode = mode;
             this.minTravelTimeSeconds = minTravelTimeSeconds;
         }
-        @Override public void visitEdge(Edge edge, State state) { }
-        @Override public void visitEnqueue(State state) { }
+        @Override public void visitEdge(Edge edge, State state) { throw new UnsupportedOperationException("visitEdge hasn't been implemented yet..."); }
+        @Override public void visitEnqueue(State state) { throw new UnsupportedOperationException("visitEnqueue hasn't been implemented yet..."); }
         // Accumulate stops as the search runs.
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
@@ -268,8 +270,8 @@ public class AnalystProfileRouterPrototype {
         ExtremaPropagationTraverseVisitor(TimeRange range0) {
             this.range0 = range0;
         }
-        @Override public void visitEdge(Edge edge, State state) { }
-        @Override public void visitEnqueue(State state) { }
+        @Override public void visitEdge(Edge edge, State state) { throw new UnsupportedOperationException("visitEdge hasn't been implemented yet..."); }
+        @Override public void visitEnqueue(State state) { throw new UnsupportedOperationException("visitEnqueue hasn't been implemented yet..."); }
         @Override public void visitVertex(State state) {
             TimeRange propagatedRange = range0.shift((int) state.getElapsedTimeSeconds());
             Vertex vertex = state.getVertex();

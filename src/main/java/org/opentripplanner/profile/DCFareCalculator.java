@@ -41,51 +41,58 @@ public class DCFareCalculator {
         // The former is the same for all routes in the feed. The latter is the true agency of the feed.
 
         String agency = route.getAgency().getId();
-        String agency_url = route.getAgency().getUrl(); // this is used in single-agency feeds so it should work
-        String short_name = route.getShortName();
-        String long_name = route.getLongName();
+        String agencyUrl = route.getAgency().getUrl(); // this is used in single-agency feeds so it should work
+        String shortName = route.getShortName();
+
         if ("MET".equals(agency)) {
             if (route.getType() == 1) return RideType.METRO_RAIL;
-            if ("5A".equals(short_name) || "B30".equals(short_name)) return RideType.METRO_BUS_AIRPORT;
-            for (String sn : metroExpress) if (sn.equals(short_name)) return RideType.METRO_BUS_EXPRESS;
+            if ("5A".equals(shortName) || "B30".equals(shortName)) return RideType.METRO_BUS_AIRPORT;
+            for (String sn : metroExpress) if (sn.equals(shortName)) return RideType.METRO_BUS_EXPRESS;
             return RideType.METRO_BUS_LOCAL;
         } else if ("DC".equals(agency)) {
             return RideType.DC_CIRCULATOR_BUS;
         } else if ("MCRO".equals(agency)) {
-            if (short_name.equals("70")) return RideType.MCRO_BUS_EXPRESS;
+            if (shortName.equals("70")) return RideType.MCRO_BUS_EXPRESS;
             else return RideType.MCRO_BUS_LOCAL;
-        } else if (agency_url != null) {
-            if (agency_url.contains("fairfaxconnector.com")) {
-                return RideType.FAIRFAX_CONNECTOR_BUS;
+        } else if (agencyUrl != null) {
+            return getRideTypeByAgencyUrl(route);
+        }
+        return null;
+    }
+
+    private static RideType getRideTypeByAgencyUrl(Route route) {
+        String agencyUrl = route.getAgency().getUrl();
+
+        if (agencyUrl.contains("fairfaxconnector.com")) {
+            return RideType.FAIRFAX_CONNECTOR_BUS;
+        }
+        if (agencyUrl.contains("prtctransit.org")) {
+            return RideType.PRTC_BUS;
+        }
+        if (agencyUrl.contains("arlingtontransit.com")) {
+            return RideType.ART_BUS;
+        }
+        if (agencyUrl.contains("vre.org")) {
+            return RideType.VRE_RAIL;
+        }
+        if (agencyUrl.contains("mtamaryland.com")) {
+            if (route.getType() == 2) return RideType.MARC_RAIL;
+            int shortName;
+            try {
+                shortName = Integer.parseInt(route.getShortName());
             }
-            if (agency_url.contains("prtctransit.org")) {
-                return RideType.PRTC_BUS;
+            catch(NumberFormatException ex) {
+                // assume a local bus if route number cannot be parsed
+                return RideType.MTA_BUS_LOCAL;
             }
-            if (agency_url.contains("arlingtontransit.com")) {
-                return RideType.ART_BUS;
+            if(shortName < 100) { // local routes are 0 - 99
+                return RideType.MTA_BUS_LOCAL;
             }
-            if (agency_url.contains("vre.org")) {
-                return RideType.VRE_RAIL;
+            else if(shortName < 200) { // express routes are 100 - 199
+                return RideType.MTA_BUS_EXPRESS;
             }
-            if (agency_url.contains("mtamaryland.com")) {
-                if (route.getType() == 2) return RideType.MARC_RAIL;
-                int shortName;
-                try {
-                	shortName = Integer.parseInt(route.getShortName());
-                }
-                catch(NumberFormatException ex) {
-                	// assume a local bus if route number cannot be parsed
-                	return RideType.MTA_BUS_LOCAL;
-                }
-                if(shortName < 100) { // local routes are 0 - 99
-                	return RideType.MTA_BUS_LOCAL;
-                }
-                else if(shortName < 200) { // express routes are 100 - 199
-                	return RideType.MTA_BUS_EXPRESS;
-                }
-                // commuter routes are 200+
-                return RideType.MTA_BUS_COMMUTER;
-            }
+            // commuter routes are 200+
+            return RideType.MTA_BUS_COMMUTER;
         }
         return null;
     }
@@ -118,14 +125,14 @@ public class DCFareCalculator {
         return fares;
     }
     
-    public static Rectangle2D.Double createFareZone(double min_lon, double max_lat, double max_lon, double min_lat) {
-    	return new Rectangle2D.Double(min_lon, max_lat, max_lon - min_lon, max_lat - min_lat);
+    public static Rectangle2D.Double createFareZone(double minLon, double maxLat, double maxLon, double minLat) {
+    	return new Rectangle2D.Double(minLon, maxLat, maxLon - minLon, maxLat - minLat);
     }
 
     static class FareArea extends Rectangle2D.Double {
     	
-    	public FareArea(double min_lon, double min_lat, double max_lon, double max_lat) {
-    		super(min_lon, min_lat, max_lon - min_lon, max_lat - min_lat);
+    	public FareArea(double minLon, double minLat, double maxLon, double maxLat) {
+    		super(minLon, minLat, maxLon - minLon, maxLat - minLat);
     	}
     	
     	public boolean containsStop(Stop stop) {
